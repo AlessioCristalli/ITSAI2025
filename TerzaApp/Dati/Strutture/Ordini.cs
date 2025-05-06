@@ -7,6 +7,7 @@
         public List<RigaOrdine> rigaOrdine { get; set; } = new List<RigaOrdine>();
         public string IndirizzoSpedizione { get; set; } = "";
         public int PrezzoTotale { get; set; } = 0;
+        public string Currency => $"{this.PrezzoTotale:C2}";
         public override string ToString()
         {
             return IDordine.ToString();
