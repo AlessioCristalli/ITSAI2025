@@ -1,0 +1,101 @@
+﻿@page "/Collezioni"
+@using System.Text.Json
+@using TerzaApp.Dati.Strutture
+@inject TerzaApp.Dati.Archivio db
+
+<h1>Collezioni</h1>
+
+<input class="form-control" @bind="ricerca" placeholder="Cerca tra le collezioni.." />
+
+@if (@stoInserendo)
+{
+    <div class="row">
+        <div class="col-md-3">Nome Collezione</div>
+        <div class="col-md-3"><input @bind="bozza.NomeCollezione" class="form-control" /></div>
+        <div class="btn btn-sm btn-success" @onclick="Salva">Salva</div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome Collezione</th>
+                    <th>Prodotti</th>
+                    <th width="1%"></th>
+                    <th width="1%" class="text-end">
+                        <div class="btn btn-sm btn-success" @onclick="e => stoInserendo = true">Nuovo</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Collezione singola in db.collezioni)
+                {
+                    if (singola.NomeCollezione.Contains(ricerca))
+                    {
+                        <tr>
+                            <td>@singola.IDcollezione</td>
+                            <td>@singola.NomeCollezione</td>
+                            <td>
+                                <ul>
+                                    @foreach (Prodotto singolo in db.prodotti.Where(p => p.IDcollezione == singola.IDcollezione))
+                                    {
+                                        <li>@singolo.Nome</li>
+                                    }
+                                </ul>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn btn-sm btn-warning" @onclick="m => Modifica(singola)">Modifica</div>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn btn-sm btn-danger" @onclick="e => Cancella(singola) ">Cancella</div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+}
+@code {
+    //se vogliamo passare dei parametri usiamo le lambda @onclick="F => Funzione(parametro)")
+    //Altrimenti solo il nome della funzione @onclick="Funzione"
+
+    bool stoInserendo = false;
+    string ricerca = "";
+    Collezione bozza = new Collezione();
+
+    protected override void OnInitialized()
+    {
+        // controllo se esiste un archivio dei prodotti
+        base.OnInitialized();
+    }
+
+    void Modifica(Collezione selezionato)
+    {
+        stoInserendo = true;
+        bozza = selezionato;
+    }
+    void Cancella(Collezione selezione)
+    {
+        db.collezioni.Remove(selezione);
+        db.Salva();
+    }
+
+    void Salva()
+    {
+        if (!db.collezioni.Contains(bozza))
+        {
+            /*
+            int ultimoID = db.categorie.Any() ? db.categorie.Max(i => i.ID) : 0;
+            bozza.ID = ++ultimoID;
+            */
+        db.addCollezione(bozza);
+        }
+        db.Salva();
+        bozza = new Collezione();
+        stoInserendo = false;
+    }
+}

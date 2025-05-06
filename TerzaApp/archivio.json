@@ -1,0 +1,90 @@
+{
+  "prodotti": [
+    {
+      "IDprodotto": 1,
+      "Nome": "macchinina",
+      "Descrizione": "macchinina giocattolo",
+      "Prezzo": 6,
+      "IDcategoria": 2,
+      "IDcollezione": 1,
+      "Currency": "6,00 \u20AC"
+    },
+    {
+      "IDprodotto": 2,
+      "Nome": "Giacchetto",
+      "Descrizione": "giacca in pelle",
+      "Prezzo": 21,
+      "IDcategoria": 1,
+      "IDcollezione": 1,
+      "Currency": "21,00 \u20AC"
+    },
+    {
+      "IDprodotto": 3,
+      "Nome": "Jeans",
+      "Descrizione": "Pantaloni",
+      "Prezzo": 23,
+      "IDcategoria": 1,
+      "IDcollezione": 2,
+      "Currency": "23,00 \u20AC"
+    },
+    {
+      "IDprodotto": 4,
+      "Nome": "scarpe",
+      "Descrizione": "stivali",
+      "Prezzo": 16,
+      "IDcategoria": 2,
+      "IDcollezione": 2,
+      "Currency": "16,00 \u20AC"
+    },
+    {
+      "IDprodotto": 5,
+      "Nome": "Macchina",
+      "Descrizione": "macchina",
+      "Prezzo": 26,
+      "IDcategoria": 2,
+      "IDcollezione": 1,
+      "Currency": "26,00 \u20AC"
+    },
+    {
+      "IDprodotto": 6,
+      "Nome": "Pianta",
+      "Descrizione": "pianta",
+      "Prezzo": 7,
+      "IDcategoria": 3,
+      "IDcollezione": 0,
+      "Currency": "7,00 \u20AC"
+    }
+  ],
+  "categorie": [
+    {
+      "IDcategoria": 1,
+      "Nome": "auto",
+      "Descrizione": "auto",
+      "DateTime": "2025-05-05T17:39:56.7735954+02:00"
+    },
+    {
+      "IDcategoria": 2,
+      "Nome": "vestiti",
+      "Descrizione": "vestiti",
+      "DateTime": "2025-05-05T17:40:03.9731728+02:00"
+    },
+    {
+      "IDcategoria": 3,
+      "Nome": "casa ",
+      "Descrizione": "casa",
+      "DateTime": "2025-05-05T17:47:16.1508033+02:00"
+    }
+  ],
+  "utenti": [],
+  "ordini": [
+    {
+      "IDordine": 1,
+      "IDutente": 1,
+      "rigaOrdine": [],
+      "IndirizzoSpedizione": "1",
+      "PrezzoTotale": 0
+    }
+  ],
+  "rigaOrdini": [],
+  "collezioni": []
+}

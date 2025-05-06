@@ -1,0 +1,57 @@
+﻿@page "/Divisioni"
+
+<h1 class="text-center text-info"><b>Divisioni</b></h1>
+<br />
+<div class="row">
+    <div class="col-md-6">
+        <div class="input-group mb-3">
+            <span class="input-group-text w-auto">Dividendo &#11014;</span>
+            <input type="number" class="form-control" @bind="dividendo" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="input-group mb-3">
+            <span class="input-group-text w-auto">N. volte divisione &#11015;</span>
+            <input type="number" class="form-control" @bind="divisore" />
+        </div>
+    </div>
+</div>
+<br />
+<div class="col-md-12">
+    <h3><b>Risultato</b></h3>
+    @calcola()
+</div>
+
+@code {
+    string dividendo = "10";
+    string divisore = "2";
+    string risultato = "";
+    //MarkupString risultatoHTML = new MarkupString();
+
+    MarkupString calcola()
+    {
+        if (!string.IsNullOrEmpty(dividendo) && !string.IsNullOrEmpty(divisore))
+        {
+            float floatDividendo = float.Parse(dividendo);
+            float floatDivisore = float.Parse(divisore);
+            if (floatDividendo != 0 && floatDivisore != 0)
+            {
+                risultato = "<ul>"; 
+                for(int i = 1; i <= floatDivisore; i++)
+                {
+                    risultato += $"<li>{floatDividendo} : {i} = {floatDividendo / i:N2}</li>";
+                }
+                risultato += "</ul>";
+                return new MarkupString(risultato);
+            }
+            else
+            {
+                return new MarkupString("<p class='text-warning'>Risultato indefinto o non divisibile, non possono esserci 0 nella divisione!</p>");
+            }
+        }
+        else
+        {
+            return new MarkupString("<p class='text-danger'>Inserire i valori.</p>");
+        }
+    }
+}

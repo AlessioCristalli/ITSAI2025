@@ -1,0 +1,175 @@
+﻿@page "/Ordini"
+@using System.Text.Json
+@using TerzaApp.Dati.Strutture
+@inject TerzaApp.Dati.Archivio db
+
+<h1>Il tuo ordine</h1>
+
+<input class="form-control" @bind="ricerca" placeholder="Cerca tra gli utenti..." />
+
+@if (@stoInserendo)
+{
+    <div class="row">
+        <div class="col-md-3">Utente</div>
+        <select @onchange="utenteModificato" class="form-control">
+            <option value="0">Nessuno</option>
+            @foreach (Utente singolo in db.utenti)
+            {
+                if (singolo.IDutente == bozza.IDutente)
+                {
+                    <option value="@singolo.IDutente" selected>@singolo.Nome</option>
+                }
+                else
+                {
+                    <option value="@singolo.IDutente">@singolo.Nome</option>
+                }
+            }
+        </select>
+        <div class="col-md-3">Indirizzo Spedizione</div>
+        <select class="form-control">
+            <option value="Nessun indirizzo">Nessuno</option>
+            @foreach (Utente singolo in db.utenti.Where(i => i.IDutente == bozza.IDutente))
+            {
+                if (singolo.IDutente == bozza.IDutente)
+                {
+                    <option value="@singolo.Indirizzo" selected>@singolo.Indirizzo</option>
+                }
+                else
+                {
+                    <option value="@singolo.Indirizzo">@singolo.Indirizzo</option>
+                }
+            }
+        </select>
+        <div class="col-md-3">Prodotto</div>
+        <div class="col-md-3">
+            <select @onchange="prodottoModificato" class="form-control">
+                <option value="0">Nessuna</option>
+                @foreach (RigaOrdine singola in db.rigaOrdini)
+                {
+                    if (singola.IDrigaOrdine == bozza.IDordine)
+                    {
+                        <option value="@singola.IDrigaOrdine" selected>@singola.Nome</option>
+                    }
+                    else
+                    {
+                        <option value="@singola.IDrigaOrdine">@singola.Nome</option>
+                    }
+                }
+            </select>
+        </div>
+        <p>Qui verrà mostrato il totale</p>
+        <div class="btn btn-small btn-info" @onclick="AggiungiRiga">Aggiungi Riga</div>
+        <br />
+        <div class="btn btn-sm btn-success" @onclick="Salva">Salva</div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>ID ordine</th>
+                    <th>Utente</th>
+                    <th>Indirizzo</th>
+                    <th>Prodotti Ordinati</th>
+                    <th width="1%"></th>
+                    <th width="1%" class="text-end">
+                        <div class="btn btn-sm btn-success" @onclick="e => stoInserendo = true">Nuovo</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Ordine singolo in db.ordini)
+                {
+                    <tr>
+                        <td>@singolo.IDordine</td>
+                        <td>@db.utenti.FirstOrDefault(x => x.IDutente == singolo.IDutente)</td>
+                        <td>@singolo.IndirizzoSpedizione</td>
+                        <td>
+                            <ul>
+                                @foreach (RigaOrdine riga in singolo.rigaOrdine)
+                                {
+                                    <li>@riga.Nome - Quantità: @riga.Quantità</li>
+                                }
+                            </ul>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn btn-sm btn-warning" @onclick="m => Modifica(singolo)">Modifica</div>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn btn-sm btn-danger" @onclick="e => Cancella(singolo) ">Cancella</div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+@code {
+    bool stoInserendo = false;
+    string ricerca = "";
+    Ordine bozza = new Ordine();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    void utenteModificato(ChangeEventArgs evento)
+    {
+        bozza.IDutente = int.Parse(evento.Value.ToString());
+        //Modifica in automatico il valore dell'indirizzo all'inserimento dell'utente.
+        //Altrimenti dovrei clickarlo per prendere l'evento.
+        var utente = db.utenti.FirstOrDefault(x => x.IDutente == bozza.IDutente);
+        if (utente != null)
+        {
+            bozza.IndirizzoSpedizione = utente.Indirizzo;
+        }
+
+    }
+
+    void prodottoModificato(ChangeEventArgs evento)
+    {
+        int idRigaOrdine = int.Parse(evento.Value.ToString());
+        var riga = db.rigaOrdini.FirstOrDefault(x => x.IDrigaOrdine == idRigaOrdine);
+        if (riga != null)
+        {
+            bozza.rigaOrdine.Add(new RigaOrdine
+            {
+                    IDrigaOrdine = riga.IDrigaOrdine,
+                    IDprodotto = riga.IDprodotto,
+                    Nome = riga.Nome,
+                    PrezzoTotale = riga.PrezzoTotale,
+                    Quantità = riga.Quantità,
+            });
+        }
+    }
+
+    void AggiungiRiga()
+    {
+        prodottoModificato(new ChangeEventArgs{Value = "0"});
+    }
+
+    void Modifica(Ordine selezionato)
+    {
+        stoInserendo = true;
+        bozza = selezionato;
+    }
+    void Cancella(Ordine selezione)
+    {
+        db.ordini.Remove(selezione);
+        db.Salva();
+    }
+
+    void Salva()
+    {
+        if (!db.ordini.Contains(bozza))
+        {
+            db.addOrdine(bozza);
+        }
+        db.Salva();
+        bozza = new Ordine();
+        stoInserendo = false;
+    }
+}

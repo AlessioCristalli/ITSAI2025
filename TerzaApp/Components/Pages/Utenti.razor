@@ -1,0 +1,107 @@
+﻿@page "/Utenti"
+@using System.Text.Json
+@using TerzaApp.Dati.Strutture
+@inject TerzaApp.Dati.Archivio db
+
+<h1>Utenti</h1>
+
+<input class="form-control" @bind="ricerca" placeholder="Cerca tra gli utenti..." />
+
+@if (@stoInserendo)
+{
+    <div class="row">
+        <div class="col-md-3">Nome</div>
+        <div class="col-md-3"><input @bind="bozza.Nome" class="form-control" /></div>
+        <div class="col-md-3">Cognome</div>
+        <div class="col-md-3"><textarea @bind="bozza.Cognome" class="form-control"></textarea></div>
+        <div class="col-md-3">Età</div>
+        <div class="col-md-3"><input @bind="bozza.Eta" type="number"class="form-control" /></div>
+        <div class="col-md-3">Email</div>
+        <div class="col-md-3"><input @bind="bozza.Email" class="form-control" /></div>
+        <div class="col-md-3">Indirizzo</div>
+        <div class="col-md-3"><input @bind="bozza.Indirizzo" class="form-control" /></div>
+        <div class="btn btn-sm btn-success" @onclick="Salva">Salva</div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Età</th>
+                    <th>Email</th>
+                    <th>Indirizzo</th>
+                    <th width="1%"></th>
+                    <th width="1%" class="text-end">
+                        <div class="btn btn-sm btn-success" @onclick="e => stoInserendo = true">Nuovo</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Utente singolo in db.utenti)
+                {
+                    if (singolo.Nome.Contains(ricerca) || singolo.Cognome.Contains(ricerca))
+                    {
+                        <tr>
+                            <td>@singolo.IDutente</td>
+                            <td>@singolo.Nome</td>
+                            <td>@singolo.Cognome</td>
+                            <td>@singolo.Eta</td>
+                            <td>@singolo.Email</td>
+                            <td>@singolo.Indirizzo</td>
+                            <td class="text-end">
+                                <div class="btn btn-sm btn-warning" @onclick="m => Modifica(singolo)">Modifica</div>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn btn-sm btn-danger" @onclick="e => Cancella(singolo) ">Cancella</div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+}
+@code {
+    //se vogliamo passare dei parametri usiamo le lambda @onclick="F => Funzione(parametro)")
+    //Altrimenti solo il nome della funzione @onclick="Funzione"
+
+    bool stoInserendo = false;
+    string ricerca = "";
+    Utente bozza = new Utente();
+
+    protected override void OnInitialized()
+    {
+        // controllo se esiste un archivio dei prodotti
+        base.OnInitialized();
+    }
+    void Modifica(Utente selezionato)
+    {
+        stoInserendo = true;
+        bozza = selezionato;
+    }
+    void Cancella(Utente selezione)
+    {
+        db.utenti.Remove(selezione);
+        db.Salva();
+    }
+
+    void Salva()
+    {
+        if (!db.utenti.Contains(bozza))
+        {
+            /*
+            int ultimoID = db.categorie.Any() ? db.categorie.Max(i => i.ID) : 0;
+            bozza.ID = ++ultimoID;
+            */
+            db.addUtente(bozza);
+        }
+        db.Salva();
+        bozza = new Utente();
+        stoInserendo = false;
+    }
+}

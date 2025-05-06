@@ -1,0 +1,172 @@
+﻿@page "/Spa"
+@using System.Text.Json
+@using TerzaApp.Dati.Strutture
+@inject TerzaApp.Dati.Archivio db
+
+<h3>Single Page Application</h3>
+
+<input class="form-control" @bind="ricerca" placeholder="Cerca tra i prodotti..." />
+
+@if (@stoInserendo)
+{
+    <div class ="row">
+        <div class="col-md-3">Nome</div>
+        <div class="col-md-3"><input @bind="bozza.Nome" class="form-control" /></div>
+        <div class="col-md-3">Prezzo</div>
+        <div class="col-md-3"><input type="number" @bind="bozza.Prezzo" class="form-control" /></div>
+        <div class="col-md-3">Descrizione</div>
+        <div class="col-md-3"><textarea @bind="bozza.Descrizione" class="form-control"></textarea></div>
+        <div class="col-md-3">Categoria</div>
+        <div class="col-md-3">
+            <select @onchange="categoriaModificata" class="form-select"><!--invece di onchange utilizzare bind="categoriaSelezionata" per il mio metodo-->
+                <option value="0">Nessuna</option>
+                @foreach (Categoria singola in db.categorie)
+                {
+                    if (singola.IDcategoria == bozza.IDcategoria)
+                    {
+                        <option value="@singola.IDcategoria" selected>@singola.Nome</option>
+                    }
+                    else
+                    {
+                        <option value="@singola.IDcategoria">@singola.Nome</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-3">Collezione</div>
+        <div class="col-md-3">
+            <select @onchange="collezioneModificata" class="form-select">
+                <option value="0">Nessuna</option>
+                @foreach (Collezione singola in db.collezioni)
+                {
+                    if (singola.IDcollezione == bozza.IDcollezione)
+                    {
+                        <option value="@singola.IDcollezione" selected>@singola.NomeCollezione</option>
+                    }
+                    else
+                    {
+                        <option value="@singola.IDcollezione">@singola.NomeCollezione</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="btn btn-sm btn-success" @onclick="Salva">Salva</div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Descrizione</th>
+                    <th>Categorie</th>
+                    <th>Prezzo</th>
+                    <th>Collezione</th>
+                    <th></th>
+                    <th width="1%"></th>
+                    <th width="1%" class="text-end">
+                        <div class="btn btn-sm btn-success" @onclick="e => stoInserendo = true">Nuovo</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Prodotto singolo in db.prodotti)
+                {
+                    if (singolo.Nome.Contains(ricerca) || singolo.Descrizione.Contains(ricerca))
+                    {
+                        <tr>
+                            <td>@singolo.Nome</td>
+                            <td>@singolo.Descrizione</td>
+                            <td>@db.categorie.FirstOrDefault(x => x.IDcategoria == singolo.IDcategoria)</td>
+                            <td>@singolo.Currency</td>
+                            <td>@db.collezioni.FirstOrDefault(x => x.IDcollezione == singolo.IDcollezione)</td>
+                            <td class="text-end">
+                                <div class="btn btn-sm btn-warning" @onclick="m => Modifica(singolo)">Modifica</div>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn btn-sm btn-danger" @onclick="e => Cancella(singolo) ">Cancella</div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+}
+@code {
+    //se vogliamo passare dei parametri usiamo le lambda @onclick="F => Funzione(parametro)")
+    //Altrimenti solo il nome della funzione @onclick="Funzione"
+
+    bool stoInserendo = false;
+    string ricerca = "";
+    string categoriaSelezionata = "";
+    Prodotto bozza = new Prodotto();
+
+    void categoriaModificata(ChangeEventArgs evento)
+    {
+        bozza.IDcategoria = int.Parse(evento.Value.ToString());
+    }
+
+    void collezioneModificata(ChangeEventArgs evento)
+    {
+        bozza.IDcollezione = int.Parse(evento.Value.ToString());
+    }
+
+    void Modifica(Prodotto selezionato)
+    {
+        stoInserendo = true;
+        bozza = selezionato;
+    }
+
+    protected override void OnInitialized()
+    {
+        // controllo se esiste un archivio dei prodotti
+        base.OnInitialized();
+    }
+
+    void Cancella(Prodotto selezionato)
+    {
+        db.prodotti.Remove(selezionato);
+        db.Salva();
+    }
+
+    void Salva()
+    {
+        //se non esiste già
+        if (!db.prodotti.Contains(bozza))
+        {
+            db.addProdotto(bozza);
+        }
+
+        /*
+          bozza.Categoria = db.categorie.FirstOrDefault(c => c.Nome == categoriaSelezionata); Fatto da me senza categoriaModificata,
+        */
+
+        // poi salvo
+        db.Salva();
+        // e infine resetto
+        bozza = new Prodotto();
+        categoriaSelezionata = "";
+        stoInserendo = false;
+        /*
+        if (!string.IsNullOrEmpty(testo))
+        {
+            string[] parti = testo.Split(',');
+            string nomeProdotto = parti[0];
+            string descrizioneProdotto = parti[1];
+            double prezzoProdotto = double.Parse(parti[2]);
+            prodotti.Add(new Prodotto
+            {
+                Nome = nomeProdotto,
+                Descrizione = descrizioneProdotto,
+                Prezzo = prezzoProdotto
+                });
+            testo = "";
+            string versioneJSON = JsonSerializer.Serialize(prodotti);
+            }
+        */
+    }
+}
+  

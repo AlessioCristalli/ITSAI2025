@@ -1,0 +1,17 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Benvenuto nel nostro sito a massimo livello di sicurezza.
+
+<p>Sono le ore: @DateTime.Now.ToString("HH:mm:ss")</p>
+<br />
+<input type="number" class="form-control" @bind="testo" />
+<br />
+<p>@testo</p>
+@code {
+    string testo = "";
+}
+

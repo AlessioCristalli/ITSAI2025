@@ -1,0 +1,149 @@
+﻿@page "/RigaOrdini"
+@using System.Text.Json
+@using TerzaApp.Dati.Strutture
+@inject TerzaApp.Dati.Archivio db
+
+<h3>Riga Ordini (Carrello)</h3>
+
+<input class="form-control" @bind="ricerca" placeholder="Cerca nel carrello..." />
+
+@if (@stoInserendo)
+{
+    <div class="row">
+        <div class="col-md-3">Nome</div>
+        <div class="col-md-3"><input @bind="bozza.Nome" class="form-control" /></div>
+        <div class="col-md-3">Quantità</div>
+        <div class="col-md-3"><input type="number" min="0" class="form-control" @onchange="quantitàModificata"/></div>
+        <div class="col-md-3">Prodotti</div>
+        <div class="col-md-3">
+            <select @onchange="prodottiModificati" class="form-select">
+                <!--invece di onchange utilizzare bind="categoriaSelezionata" per il mio metodo-->
+                <option value="0">Nessuna</option>
+                @foreach (Prodotto singolo in db.prodotti)
+                {
+                    if (singolo.IDprodotto == bozza.IDprodotto)
+                    {
+                        <option value="@singolo.IDprodotto" selected>@singolo.Nome</option>
+                    }
+                    else
+                    {
+                        <option value="@singolo.IDprodotto">@singolo.Nome</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="btn btn-sm btn-success" @onclick="Salva">Salva</div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <!-- <th>ID Ordine</th> -->
+                    <th>Prodotto</th>
+                    <th>Quantità</th>
+                    <th>Prezzo Totale</th>
+                    <th></th>
+                    <th width="1%"></th>
+                    <th width="1%" class="text-end">
+                        <div class="btn btn-sm btn-success" @onclick="e => stoInserendo = true">Nuovo</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (RigaOrdine singola in db.rigaOrdini)
+                {
+                    if (singola.Nome.Contains(ricerca))
+                    {
+                        <tr>
+                            <td>@singola.IDrigaOrdine</td>
+                            <td>@singola.Nome</td>
+                            <td>@db.prodotti.FirstOrDefault(x => x.IDprodotto == singola.IDprodotto)</td>
+                            <td>@singola.Quantità</td>
+                            <td>@singola.Currency</td>
+                            <td class="text-end">
+                                <div class="btn btn-sm btn-warning" @onclick="m => Modifica(singola)">Modifica</div>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn btn-sm btn-danger" @onclick="e => Cancella(singola) ">Cancella</div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+}
+@code {
+    //se vogliamo passare dei parametri usiamo le lambda @onclick="F => Funzione(parametro)")
+    //Altrimenti solo il nome della funzione @onclick="Funzione"
+
+    bool stoInserendo = false;
+    string ricerca = "";
+    RigaOrdine bozza = new RigaOrdine();
+
+    void prodottiModificati(ChangeEventArgs evento)
+    {
+        bozza.IDprodotto = int.Parse(evento.Value.ToString());
+    }
+
+    void quantitàModificata(ChangeEventArgs evento)
+    {
+        bozza.Quantità = int.Parse(evento.Value.ToString());
+    }
+
+    void Modifica(RigaOrdine selezionato)
+    {
+        stoInserendo = true;
+        bozza = selezionato;
+    }
+
+    protected override void OnInitialized()
+    {
+        // controllo se esiste un archivio dei prodotti
+        base.OnInitialized();
+    }
+
+    void Cancella(RigaOrdine selezionato)
+    {
+        db.rigaOrdini.Remove(selezionato);
+        db.Salva();
+    }
+
+    void Salva()
+    {
+        var prodotto = db.prodotti.FirstOrDefault(p => p.IDprodotto == bozza.IDprodotto);
+        if (prodotto != null)
+        {
+            bozza.PrezzoTotale = calcolaPrezzoTotale(prodotto.Prezzo, bozza.Quantità);
+        }
+
+        //se non esiste già
+        if (!db.rigaOrdini.Contains(bozza))
+        {
+            db.addRigaOrdine(bozza);
+        }
+
+        /*
+        bozza.Categoria = db.categorie.FirstOrDefault(c => c.Nome == categoriaSelezionata); Fatto da me senza categoriaModificata,
+       */
+
+    // poi salvo
+    db.Salva();
+        // e infine resetto
+        bozza = new RigaOrdine();
+        stoInserendo = false;
+
+    }
+
+    public decimal calcolaPrezzoTotale(decimal prezzoUnitario, int quantità)
+    {
+        return prezzoUnitario * quantità;
+    }
+
+}
+
