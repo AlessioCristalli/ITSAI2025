@@ -1,0 +1,36 @@
+﻿@if(nuova){
+    <div class="nav-item px-3 text-white">
+        <NavLink class="nav-link" href="@href" target="_blank">
+            <i class="bi @icona me-3"></i> @descrizione
+        </NavLink>
+    </div>
+}
+else
+{
+    <div class="nav-item px-3 text-white">
+        <NavLink class="nav-link" href="@href">
+            <i class="bi @icona me-3"></i> @descrizione
+        </NavLink>
+    </div>
+}
+
+
+@code {
+    /// <summary>
+    /// L'indirizzo a cui la voce di menù punterà quando viene cliccata
+    /// </summary>
+    [Parameter] public string href { get; set; } = string.Empty;
+    /// <summary>
+    /// Il testo descrittivo che l'utente puo impostare come voce di menù
+    /// </summary>
+    [Parameter] public string descrizione { get; set; } = string.Empty;
+    /// <summary>
+    /// La sola componente testuale dell'icona Bootstrap (es. bi-trash)
+    /// </summary>
+    [Parameter] public string icona { get; set; } = string.Empty;
+    /// <summary>
+    /// Se impostato su true apre il link su una nuova tab
+    /// </summary>
+    [Parameter] public bool nuova { get; set; } = false;
+}
+}

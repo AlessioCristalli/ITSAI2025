@@ -3,55 +3,50 @@
 @using TerzaApp.Dati.Strutture
 @inject TerzaApp.Dati.Archivio db
 
-<h3>Single Page Application</h3>
-
-<input class="form-control" @bind="ricerca" placeholder="Cerca tra i prodotti..." />
+<Titolo titolo="Prodotti" ricerca="true" OnRicerca="testo => ricerca = testo">
+    <u>usa questa pagina per gestire i tuoi prodotti!</u>
+</Titolo>
 
 @if (@stoInserendo)
 {
     <div class ="row">
-        <div class="col-md-3">Nome</div>
-        <div class="col-md-3"><input @bind="bozza.Nome" class="form-control" /></div>
-        <div class="col-md-3">Prezzo</div>
-        <div class="col-md-3"><input type="number" @bind="bozza.Prezzo" class="form-control" /></div>
-        <div class="col-md-3">Descrizione</div>
-        <div class="col-md-3"><textarea @bind="bozza.Descrizione" class="form-control"></textarea></div>
-        <div class="col-md-3">Categoria</div>
+        <div class="col-md-3"><b>Nome</b></div>
+        <div class="col-md-3"><input @bind="bozza.Nome" class="form-control mb-2" /></div>
+        <div class="col-md-3"><b>Prezzo</b></div>
+        <div class="col-md-3"><input type="number" @bind="bozza.Prezzo" min="0" class="form-control mb-2" /></div>
+        <div class="col-md-3"><b>Descrizione</b></div>
+        <div class="col-md-3"><textarea @bind="bozza.Descrizione" class="form-control mb-2"></textarea></div>
+        <div class="col-md-3"><b>Categoria</b></div>
         <div class="col-md-3">
-            <select @onchange="categoriaModificata" class="form-select"><!--invece di onchange utilizzare bind="categoriaSelezionata" per il mio metodo-->
-                <option value="0">Nessuna</option>
-                @foreach (Categoria singola in db.categorie)
+            <ListaLut elementi="db.categorie" etichetta="categoria..." PK="x => x.IDcategoria" OnSelect="x => bozza.IDcategoria = x" ID="bozza.IDcategoria"/>
+        </div>
+        <div class="col-md-3"><b>Collezione</b></div>
+        <div class="col-md-3">
+            <ListaLut elementi="db.collezioni" etichetta="collezione..." PK="x => x.IDcollezione" OnSelect="x => bozza.IDcollezione = x" ID="bozza.IDcollezione"/>
+        </div>
+        <div class="col-md-3"><b>Immagine</b></div>
+        <div class="col-md-3">
+            <select @onchange="immagineModificata" class="form-select mb-2">
+                <option value="Nessuna">Nessuna</option>
+                @foreach (var file in Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Immagini")))
                 {
-                    if (singola.IDcategoria == bozza.IDcategoria)
+                    var fileName = Path.GetFileName(file);
+                    if (fileName == bozza.href)
                     {
-                        <option value="@singola.IDcategoria" selected>@singola.Nome</option>
+                        <option value="@fileName" selected>@fileName</option>
                     }
                     else
                     {
-                        <option value="@singola.IDcategoria">@singola.Nome</option>
+                        <option value="@fileName">@fileName</option>
                     }
                 }
             </select>
-        </div>
-        <div class="col-md-3">Collezione</div>
-        <div class="col-md-3">
-            <select @onchange="collezioneModificata" class="form-select">
-                <option value="0">Nessuna</option>
-                @foreach (Collezione singola in db.collezioni)
-                {
-                    if (singola.IDcollezione == bozza.IDcollezione)
-                    {
-                        <option value="@singola.IDcollezione" selected>@singola.NomeCollezione</option>
-                    }
-                    else
-                    {
-                        <option value="@singola.IDcollezione">@singola.NomeCollezione</option>
-                    }
-                }
-            </select>
-        </div>
-        <div class="btn btn-sm btn-success" @onclick="Salva">Salva</div>
+            <!-- <div class="col-md-3"><input type="text" @bind="bozza.href" min="0" placeholder="Inserisci il nome dell'immagine" class="form-control mb-2" /></div> -->
+        </div>    
+        <div class="col-md-3"><b>Disponibilità</b></div>
+        <div class="col-md-3"><input type="text" @bind="bozza.Disponibilità" min="0" placeholder="Inserisci la disponibilità" class="form-control mb-2" /></div>
     </div>
+    <div class="btn btn-sm btn-success w-auto" @onclick="Salva">Salva</div>
 }
 else
 {
@@ -64,7 +59,7 @@ else
                     <th>Categorie</th>
                     <th>Prezzo</th>
                     <th>Collezione</th>
-                    <th></th>
+                    <th>Disponibilità</th>
                     <th width="1%"></th>
                     <th width="1%" class="text-end">
                         <div class="btn btn-sm btn-success" @onclick="e => stoInserendo = true">Nuovo</div>
@@ -82,6 +77,7 @@ else
                             <td>@db.categorie.FirstOrDefault(x => x.IDcategoria == singolo.IDcategoria)</td>
                             <td>@singolo.Currency</td>
                             <td>@db.collezioni.FirstOrDefault(x => x.IDcollezione == singolo.IDcollezione)</td>
+                            <td>@singolo.Disponibilità</td>
                             <td class="text-end">
                                 <div class="btn btn-sm btn-warning" @onclick="m => Modifica(singolo)">Modifica</div>
                             </td>
@@ -114,6 +110,11 @@ else
         bozza.IDcollezione = int.Parse(evento.Value.ToString());
     }
 
+    void immagineModificata(ChangeEventArgs evento)
+    {
+        bozza.href = evento.Value.ToString();
+    }
+
     void Modifica(Prodotto selezionato)
     {
         stoInserendo = true;
@@ -141,7 +142,7 @@ else
         }
 
         /*
-          bozza.Categoria = db.categorie.FirstOrDefault(c => c.Nome == categoriaSelezionata); Fatto da me senza categoriaModificata,
+          bozza.Categoria = db.FirstOrDefault(c => c.Nome == categoriaSelezionata); Fatto da me senza categoriaModificata,
         */
 
         // poi salvo
@@ -150,7 +151,8 @@ else
         bozza = new Prodotto();
         categoriaSelezionata = "";
         stoInserendo = false;
-        /*
+        
+       /*
         if (!string.IsNullOrEmpty(testo))
         {
             string[] parti = testo.Split(',');

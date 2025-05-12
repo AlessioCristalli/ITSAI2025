@@ -1,0 +1,45 @@
+﻿@typeparam TItem
+
+<select class="form-select" @onchange="Change">
+    <option value="0">@etichetta</option>
+    @foreach(TItem singolo in elementi)
+    {
+        @if (PK(singolo) == ID)
+        {
+            <option value="@PK(singolo)" selected>@singolo.ToString()</option>
+        }
+        else
+        {
+            <option value="@PK(singolo)">@singolo.ToString()</option>
+        }
+    }
+</select>
+
+@code {
+    //ES. ListaLut<Categoria>, ListaLut<Collezione>, ListaLut<Utente>
+    //<ListaLut elementi ="db.categorie" PK="x => x.IDcategoria" />
+
+    [Parameter] public int ID { get; set; } = 0;
+    /// <summary>
+    /// carica la collezione degli elementi 
+    /// </summary>
+    [Parameter] public IEnumerable<TItem> elementi { get; set; }
+    //EvenetCallback ci permette di avvertire l'utente
+    [Parameter] public EventCallback<int> OnSelect { get; set; }
+    //Func essere avverititi dallutente
+    /// <summary>
+    /// indica la chiave primaria della Lut
+    /// </summary>
+    [Parameter] public Func<TItem, int> PK { get; set; }
+
+    [Parameter] public string etichetta { get; set; } = "Nessuno";
+
+    private void Change(ChangeEventArgs evento)
+    {
+        int id = int.Parse(evento.Value.ToString());
+        if (OnSelect.HasDelegate)
+        {
+            OnSelect.InvokeAsync(id);
+        }
+    }
+}

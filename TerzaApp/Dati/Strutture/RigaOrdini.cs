@@ -4,7 +4,6 @@
     {
         public int IDrigaOrdine { get; set; } = 0;
         public string Nome { get; set; } = "Il tuo Carrello";
-        public int IDordine { get; set; } = 0;
         public int IDprodotto { get; set; } = 0;
         public int Quantità { get; set; } = 0;
         public decimal PrezzoTotale { get; set; } = 0;

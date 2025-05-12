@@ -9,19 +9,19 @@
 
 @if (@stoInserendo)
 {
-    <div class="row">
-        <div class="col-md-3">Nome</div>
-        <div class="col-md-3"><input @bind="bozza.Nome" class="form-control" /></div>
-        <div class="col-md-3">Cognome</div>
-        <div class="col-md-3"><textarea @bind="bozza.Cognome" class="form-control"></textarea></div>
-        <div class="col-md-3">Età</div>
-        <div class="col-md-3"><input @bind="bozza.Eta" type="number"class="form-control" /></div>
-        <div class="col-md-3">Email</div>
-        <div class="col-md-3"><input @bind="bozza.Email" class="form-control" /></div>
-        <div class="col-md-3">Indirizzo</div>
-        <div class="col-md-3"><input @bind="bozza.Indirizzo" class="form-control" /></div>
-        <div class="btn btn-sm btn-success" @onclick="Salva">Salva</div>
+    <div class="row ">
+        <div class="col-md-3"><b>Nome</b></div>
+        <div class="col-md-3"><input @bind="bozza.Nome" class="form-control mb-2" /></div>
+        <div class="col-md-3"><b>Cognome</b></div>
+        <div class="col-md-3"><input @bind="bozza.Cognome" class="form-control mb-2"></div>
+        <div class="col-md-3"><b>Età</b></div>
+        <div class="col-md-3"><input @bind="bozza.Eta" type="number" min="0" class="form-control mb-2" /></div>
+        <div class="col-md-3"><b>Email</b></div>
+        <div class="col-md-3"><input @bind="bozza.Email" class="form-control mb-2" /></div>
+        <div class="col-md-3"><b>Indirizzo</b></div>
+        <div class="col-md-3"><input @bind="bozza.Indirizzo" class="form-control mb-2" /></div>
     </div>
+    <div class="btn btn-sm btn-success w-auto" @onclick="Salva">Salva</div>
 }
 else
 {

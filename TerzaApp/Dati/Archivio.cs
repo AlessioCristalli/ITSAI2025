@@ -87,6 +87,10 @@ namespace TerzaApp.Dati
                 {
                     this.prodotti = vecchio.prodotti;
                     this.categorie = vecchio.categorie;
+                    this.utenti = vecchio.utenti;
+                    this.collezioni = vecchio.collezioni;
+                    this.rigaOrdini = vecchio.rigaOrdini;
+                    this.ordini = vecchio.ordini;
                 }
             }
         }

@@ -10,53 +10,21 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door"></span> Home
+                <span class="bi bi-house-door me-3"></span> Home
             </NavLink>
         </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Moltiplicazioni">
-                <i class="bi bi-calculator me-3"></i> Moltiplicazioni
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Divisioni">
-                <i class="bi bi-calculator me-3" ></i> Divisioni
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Spa">
-                <i class="bi bi-box2-fill me-3"></i> Prodotti
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Categorie">
-                <i class="bi bi-tags-fill me-3"></i> Categorie
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Collezioni">
-                <i class="bi bi-collection-fill me-3"></i> Collezioni
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Utenti">
-                <i class="bi bi-person-fill me-3"></i> Utenti
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Ordini">
-                <i class="bi bi-cart me-3"></i> Ordini
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="RigaOrdini">
-                <i class="bi bi-cart me-3"></i> Riga Ordini
-            </NavLink>
-        </div>
+        <VoceMenu href="Moltiplicazioni" icona="bi-calculator" descrizione="Moltiplicazioni" nuova="true"/>
+        <VoceMenu href="Divisioni" icona="bi-calculator" descrizione="Divisioni" />
+        <VoceMenu href="Spa" icona="bi-box2-fill" descrizione="Prodotti" />
+        <VoceMenu href="Categorie" icona="bi-tags-fill" descrizione="Categorie" />
+        <VoceMenu href="Collezioni" icona="bi-collection-fill" descrizione="Collezioni" />
+        <VoceMenu href="Utenti" icona="bi-person-fill" descrizione="Utenti" />
+        <VoceMenu href="RigaOrdini" icona="bi-basket" descrizione="Riga degli ordini" />
+        <VoceMenu href="Ordini" icona="bi-cart" descrizione="Ordini" />
     </nav>
 </div>
+
+@code{
+    VoceMenu voceMenu = new VoceMenu();
+}
 

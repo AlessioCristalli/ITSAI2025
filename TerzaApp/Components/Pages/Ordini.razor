@@ -10,43 +10,47 @@
 @if (@stoInserendo)
 {
     <div class="row">
-        <div class="col-md-3">Utente</div>
-        <select @onchange="utenteModificato" class="form-control">
-            <option value="0">Nessuno</option>
-            @foreach (Utente singolo in db.utenti)
-            {
-                if (singolo.IDutente == bozza.IDutente)
-                {
-                    <option value="@singolo.IDutente" selected>@singolo.Nome</option>
-                }
-                else
-                {
-                    <option value="@singolo.IDutente">@singolo.Nome</option>
-                }
-            }
-        </select>
-        <div class="col-md-3">Indirizzo Spedizione</div>
-        <select class="form-control">
-            <option value="Nessun indirizzo">Nessuno</option>
-            @foreach (Utente singolo in db.utenti.Where(i => i.IDutente == bozza.IDutente))
-            {
-                if (singolo.IDutente == bozza.IDutente)
-                {
-                    <option value="@singolo.Indirizzo" selected>@singolo.Indirizzo</option>
-                }
-                else
-                {
-                    <option value="@singolo.Indirizzo">@singolo.Indirizzo</option>
-                }
-            }
-        </select>
-        <div class="col-md-3">Prodotto</div>
+        <div class="col-md-3"><b>Utente</b></div>
         <div class="col-md-3">
-            <select @onchange="prodottoModificato" class="form-control">
+            <select @onchange="utenteModificato" class="form-control mb-2">
+                <option value="0">Nessuno</option>
+                @foreach (Utente singolo in db.utenti)
+                {
+                    if (singolo.IDutente == bozza.IDutente)
+                    {
+                        <option value="@singolo.IDutente" selected>@singolo.Nome</option>
+                    }
+                    else
+                    {
+                        <option value="@singolo.IDutente">@singolo.Nome</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-3"><b>Indirizzo Spedizione</b></div>
+        <div class="col-md-3">
+            <select class="form-control mb-2">
+                <option value="Nessun indirizzo">Nessuno</option>
+                @foreach (Utente singolo in db.utenti.Where(i => i.IDutente == bozza.IDutente))
+                {
+                    if (singolo.IDutente == bozza.IDutente)
+                    {
+                        <option value="@singolo.Indirizzo" selected>@singolo.Indirizzo</option>
+                    }
+                    else
+                    {
+                        <option value="@singolo.Indirizzo">@singolo.Indirizzo</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-3"><b>Ordine</b></div>
+        <div class="col-md-3">
+            <select @onchange="prodottoModificato" class="form-control mb-2">
                 <option value="0">Nessuna</option>
                 @foreach (RigaOrdine singola in db.rigaOrdini)
                 {
-                    if (singola.IDrigaOrdine == bozza.IDordine)
+                    if (bozza.rigaOrdine.Any(r => r.IDrigaOrdine == singola.IDrigaOrdine)) //controlla se è presente dentro la lista rigaOrdine di ordini un IDrigaOrdine uguale a della classe rigaOrdine
                     {
                         <option value="@singola.IDrigaOrdine" selected>@singola.Nome</option>
                     }
@@ -57,11 +61,8 @@
                 }
             </select>
         </div>
-        <p>Qui verrà mostrato il totale</p>
-        <div class="btn btn-small btn-info" @onclick="AggiungiRiga">Aggiungi Riga</div>
-        <br />
-        <div class="btn btn-sm btn-success" @onclick="Salva">Salva</div>
     </div>
+    <div class="btn btn-sm btn-success" @onclick="Salva">Salva</div>
 }
 else
 {
@@ -73,6 +74,7 @@ else
                     <th>Utente</th>
                     <th>Indirizzo</th>
                     <th>Prodotti Ordinati</th>
+                    <th>PrezzoTotale</th>
                     <th width="1%"></th>
                     <th width="1%" class="text-end">
                         <div class="btn btn-sm btn-success" @onclick="e => stoInserendo = true">Nuovo</div>
@@ -87,13 +89,17 @@ else
                         <td>@db.utenti.FirstOrDefault(x => x.IDutente == singolo.IDutente)</td>
                         <td>@singolo.IndirizzoSpedizione</td>
                         <td>
-                            <ul>
+
                                 @foreach (RigaOrdine riga in singolo.rigaOrdine)
                                 {
-                                    <li>@riga.Nome - Quantità: @riga.Quantità</li>
+                                    <ul>
+                                        <li>@riga.Nome</li>
+                                        <li>Prodotti: @db.prodotti.FirstOrDefault(p => p.IDprodotto == riga.IDprodotto)</li>
+                                        <li>Quantità: @riga.Quantità</li>
+                                    </ul>
                                 }
-                            </ul>
                         </td>
+                        <td>@singolo.Currency</td>
                         <td class="text-end">
                             <div class="btn btn-sm btn-warning" @onclick="m => Modifica(singolo)">Modifica</div>
                         </td>
@@ -126,7 +132,6 @@ else
         {
             bozza.IndirizzoSpedizione = utente.Indirizzo;
         }
-
     }
 
     void prodottoModificato(ChangeEventArgs evento)
@@ -138,18 +143,18 @@ else
             bozza.rigaOrdine.Add(new RigaOrdine
             {
                     IDrigaOrdine = riga.IDrigaOrdine,
-                    IDprodotto = riga.IDprodotto,
                     Nome = riga.Nome,
-                    PrezzoTotale = riga.PrezzoTotale,
+                    IDprodotto = riga.IDprodotto,
                     Quantità = riga.Quantità,
+                    PrezzoTotale = riga.PrezzoTotale,
             });
         }
     }
 
-    void AggiungiRiga()
+   /*void AggiungiRiga()
     {
         prodottoModificato(new ChangeEventArgs{Value = "0"});
-    }
+    }*/
 
     void Modifica(Ordine selezionato)
     {
@@ -164,6 +169,11 @@ else
 
     void Salva()
     {
+        if( bozza.rigaOrdine != null)
+        {
+            bozza.PrezzoTotale = bozza.calcolaPrezzoTotale();//Utilizza la funzione della classe
+        }   
+
         if (!db.ordini.Contains(bozza))
         {
             db.addOrdine(bozza);

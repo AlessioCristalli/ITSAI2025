@@ -3,9 +3,9 @@
 @using TerzaApp.Dati.Strutture
 @inject TerzaApp.Dati.Archivio db
 
-<h3>Categorie</h3>
-
-<input class="form-control" @bind="ricerca" placeholder="Cerca tra le categorie..." />
+<Titolo titolo="Categorie" ricerca="@(!stoInserendo)" OnRicerca="testo => ricerca = testo">
+    <b>Usa</b> questa pagina per gestire le tue categorie
+</Titolo>
 
 @if (@stoInserendo)
 {

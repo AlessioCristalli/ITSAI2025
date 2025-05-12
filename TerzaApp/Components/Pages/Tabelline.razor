@@ -1,37 +1,38 @@
 ﻿@page "/Moltiplicazioni"
+@using TerzaApp.Components.Layout
+@layout PaginaVuota
 
 <h3>Moltiplicazioni</h3>
 
-<div class="row px-3">
+<div class="row">
     <div class="col-md-6">
-        <input type="number" class="form-control" @bind="baseTabellina" />
+        <input type="number" class="form-control" @bind="numeroBase" />
     </div>
     <div class="col-md-6">
         <input type="number" class="form-control" @bind="ripetizioni" />
     </div>
-</div>
-<div class="col-md-12">
-    @calcola()
+    <div class="col-md-12">
+        @Calcola()
+    </div>
 </div>
 
 @code {
-    string baseTabellina = "";
-    string ripetizioni = "";
+    string numeroBase = "2";
+    string ripetizioni = "10";
     string risultato = "";
-    //MarkupString risultatoHTML = new MarkupString();
 
-    MarkupString calcola()
+    MarkupString Calcola()
     {
-        int intBaseTabellina = int.Parse(baseTabellina);
-        int intRipetizioni = int.Parse(ripetizioni);
         risultato = "";
+        int intBase = int.Parse(numeroBase);
+        int intRipetizioni = int.Parse(ripetizioni);
 
-        for (int i = 1; i <= intRipetizioni; i++)
+        for(int n=0; n < intRipetizioni; n++)
         {
-            int moltiplicazione = intBaseTabellina * i;
-            risultato += $"{intBaseTabellina} x {i} = {moltiplicazione}<br />";
+            int moltiplicazione = intBase * n;
+            risultato += $"{intBase} X {n} = {moltiplicazione}<br>";
         }
-            return new MarkupString(risultato);
+        return new MarkupString(risultato);
     }
 
 }

@@ -4,87 +4,169 @@
       "IDprodotto": 1,
       "Nome": "macchinina",
       "Descrizione": "macchinina giocattolo",
-      "Prezzo": 6,
-      "IDcategoria": 2,
+      "Prezzo": 13,
+      "IDcategoria": 1,
       "IDcollezione": 1,
-      "Currency": "6,00 \u20AC"
+      "Currency": "13,00 \u20AC",
+      "href": "macchinina.jpg",
+      "Disponibilit\u00E0": "In stock"
     },
     {
       "IDprodotto": 2,
-      "Nome": "Giacchetto",
-      "Descrizione": "giacca in pelle",
-      "Prezzo": 21,
-      "IDcategoria": 1,
+      "Nome": "Pantaloni",
+      "Descrizione": "pantaloni",
+      "Prezzo": 13,
+      "IDcategoria": 2,
       "IDcollezione": 1,
-      "Currency": "21,00 \u20AC"
+      "Currency": "13,00 \u20AC",
+      "href": "pantaloni.jpg",
+      "Disponibilit\u00E0": "Ancora pochi pezzi"
     },
     {
       "IDprodotto": 3,
-      "Nome": "Jeans",
-      "Descrizione": "Pantaloni",
-      "Prezzo": 23,
-      "IDcategoria": 1,
-      "IDcollezione": 2,
-      "Currency": "23,00 \u20AC"
+      "Nome": "Maglietta",
+      "Descrizione": "Maglietta classica",
+      "Prezzo": 15,
+      "IDcategoria": 2,
+      "IDcollezione": 1,
+      "Currency": "15,00 \u20AC",
+      "href": "maglietta.jpg",
+      "Disponibilit\u00E0": "Ancora pochi pezzi"
     },
     {
       "IDprodotto": 4,
-      "Nome": "scarpe",
-      "Descrizione": "stivali",
-      "Prezzo": 16,
-      "IDcategoria": 2,
+      "Nome": "Spugna",
+      "Descrizione": "Spugna per pulire",
+      "Prezzo": 4,
+      "IDcategoria": 3,
       "IDcollezione": 2,
-      "Currency": "16,00 \u20AC"
+      "Currency": "4,00 \u20AC",
+      "href": "spugna.jpg",
+      "Disponibilit\u00E0": "Esaurito"
     },
     {
       "IDprodotto": 5,
-      "Nome": "Macchina",
-      "Descrizione": "macchina",
-      "Prezzo": 26,
+      "Nome": "Trapano",
+      "Descrizione": "trapano",
+      "Prezzo": 40,
       "IDcategoria": 2,
       "IDcollezione": 1,
-      "Currency": "26,00 \u20AC"
+      "Currency": "40,00 \u20AC",
+      "href": "trapano.jpg",
+      "Disponibilit\u00E0": "In stock"
     },
     {
       "IDprodotto": 6,
-      "Nome": "Pianta",
-      "Descrizione": "pianta",
-      "Prezzo": 7,
-      "IDcategoria": 3,
-      "IDcollezione": 0,
-      "Currency": "7,00 \u20AC"
+      "Nome": "Tastiera",
+      "Descrizione": "tastiera per pc",
+      "Prezzo": 25,
+      "IDcategoria": 4,
+      "IDcollezione": 1,
+      "Currency": "25,00 \u20AC",
+      "href": "tastiera.jpg",
+      "Disponibilit\u00E0": "In stock"
+    },
+    {
+      "IDprodotto": 7,
+      "Nome": "trapano2",
+      "Descrizione": "",
+      "Prezzo": 11,
+      "IDcategoria": 2,
+      "IDcollezione": 2,
+      "Currency": "11,00 \u20AC",
+      "href": "trapano.jpg",
+      "Disponibilit\u00E0": "20 pezzi"
     }
   ],
   "categorie": [
     {
       "IDcategoria": 1,
-      "Nome": "auto",
-      "Descrizione": "auto",
-      "DateTime": "2025-05-05T17:39:56.7735954+02:00"
+      "Nome": "Giocattoli",
+      "Descrizione": "giocattoli",
+      "DateTime": "2025-05-07T11:36:54.6878333+02:00"
     },
     {
       "IDcategoria": 2,
-      "Nome": "vestiti",
-      "Descrizione": "vestiti",
-      "DateTime": "2025-05-05T17:40:03.9731728+02:00"
+      "Nome": "Abbigliamento",
+      "Descrizione": "vestiti di vario genere",
+      "DateTime": "2025-05-07T11:37:08.7270008+02:00"
     },
     {
       "IDcategoria": 3,
-      "Nome": "casa ",
-      "Descrizione": "casa",
-      "DateTime": "2025-05-05T17:47:16.1508033+02:00"
+      "Nome": "Altro",
+      "Descrizione": "Altro",
+      "DateTime": "2025-05-08T16:03:22.5019502+02:00"
+    },
+    {
+      "IDcategoria": 4,
+      "Nome": "Elettronica",
+      "Descrizione": "oggetti elettronici",
+      "DateTime": "2025-05-08T16:24:58.3066853+02:00"
     }
   ],
-  "utenti": [],
+  "utenti": [
+    {
+      "IDutente": 1,
+      "Nome": "Roberto",
+      "Cognome": "Robertini",
+      "Eta": 16,
+      "Email": "",
+      "Indirizzo": "Via del sole"
+    }
+  ],
   "ordini": [
     {
       "IDordine": 1,
       "IDutente": 1,
-      "rigaOrdine": [],
+      "rigaOrdine": [
+        {
+          "IDrigaOrdine": 1,
+          "Nome": "Il tuo Carrello1",
+          "IDprodotto": 2,
+          "Quantit\u00E0": 2,
+          "PrezzoTotale": 30,
+          "Currency": "30,00 \u20AC"
+        },
+        {
+          "IDrigaOrdine": 2,
+          "Nome": "Il tuo Carrello2",
+          "IDprodotto": 1,
+          "Quantit\u00E0": 5,
+          "PrezzoTotale": 35,
+          "Currency": "35,00 \u20AC"
+        }
+      ],
       "IndirizzoSpedizione": "1",
-      "PrezzoTotale": 0
+      "PrezzoTotale": 65,
+      "Currency": "65,00 \u20AC"
     }
   ],
-  "rigaOrdini": [],
-  "collezioni": []
+  "rigaOrdini": [
+    {
+      "IDrigaOrdine": 1,
+      "Nome": "Il tuo Carrello1",
+      "IDprodotto": 2,
+      "Quantit\u00E0": 2,
+      "PrezzoTotale": 30,
+      "Currency": "30,00 \u20AC"
+    },
+    {
+      "IDrigaOrdine": 2,
+      "Nome": "Il tuo Carrello2",
+      "IDprodotto": 1,
+      "Quantit\u00E0": 5,
+      "PrezzoTotale": 35,
+      "Currency": "35,00 \u20AC"
+    }
+  ],
+  "collezioni": [
+    {
+      "IDcollezione": 1,
+      "NomeCollezione": "2024/2025"
+    },
+    {
+      "IDcollezione": 2,
+      "NomeCollezione": "2023/2024"
+    }
+  ]
 }

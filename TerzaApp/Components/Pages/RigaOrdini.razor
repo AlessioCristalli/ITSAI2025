@@ -10,13 +10,13 @@
 @if (@stoInserendo)
 {
     <div class="row">
-        <div class="col-md-3">Nome</div>
-        <div class="col-md-3"><input @bind="bozza.Nome" class="form-control" /></div>
-        <div class="col-md-3">Quantità</div>
-        <div class="col-md-3"><input type="number" min="0" class="form-control" @onchange="quantitàModificata"/></div>
-        <div class="col-md-3">Prodotti</div>
+        <div class="col-md-3"><b>Nome</b></div>
+        <div class="col-md-3"><input @bind="bozza.Nome" class="form-control mb-2" /></div>
+        <div class="col-md-3"><b>Quantità</b></div>
+        <div class="col-md-3"><input type="number" min="0" class="form-control mb-2" @onchange="quantitàModificata"/></div>
+        <div class="col-md-3"><b>Prodotti</b></div>
         <div class="col-md-3">
-            <select @onchange="prodottiModificati" class="form-select">
+            <select @onchange="prodottiModificati" class="form-select mb-2">
                 <!--invece di onchange utilizzare bind="categoriaSelezionata" per il mio metodo-->
                 <option value="0">Nessuna</option>
                 @foreach (Prodotto singolo in db.prodotti)
@@ -32,8 +32,8 @@
                 }
             </select>
         </div>
-        <div class="btn btn-sm btn-success" @onclick="Salva">Salva</div>
     </div>
+    <div class="btn btn-sm btn-success w-auto" @onclick="Salva">Salva</div>
 }
 else
 {
@@ -47,7 +47,6 @@ else
                     <th>Prodotto</th>
                     <th>Quantità</th>
                     <th>Prezzo Totale</th>
-                    <th></th>
                     <th width="1%"></th>
                     <th width="1%" class="text-end">
                         <div class="btn btn-sm btn-success" @onclick="e => stoInserendo = true">Nuovo</div>
