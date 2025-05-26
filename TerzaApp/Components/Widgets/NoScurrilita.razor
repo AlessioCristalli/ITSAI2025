@@ -1,0 +1,32 @@
+﻿<input class="form-control mb-2" placeholder="Scrivi qui..." @oninput="censuraTesto" @bind="testoInterno"></input>
+
+@code {
+    [Parameter] public string testo { get; set; } = String.Empty;
+    [Parameter] public EventCallback<string> testoDaFiltrare { get; set; }
+    private string testoInterno;
+    List<string> paroleCensurate = new List<string>
+    {
+        "cazzo", "pezzo di merda", "vaffanculo", "coglione", "testa di cazzo", "merda", "stronzata", "cazzata"
+    };
+
+    protected override void OnParametersSet()
+    {
+        testoInterno = testo; // Assegno bozza.Nome o descrizone a testoInterno cosi da poterlo bindare
+        base.OnParametersSet();
+    }
+
+    public void censuraTesto(ChangeEventArgs evento)
+    {
+        string testoFiltrato = evento.Value.ToString();
+        foreach (var parola in paroleCensurate)
+        {
+            string censura = new string('*', parola.Length);
+            testoFiltrato = testoFiltrato.Replace(parola, censura, StringComparison.OrdinalIgnoreCase);
+        }
+        testo = testoFiltrato;
+        if (testoDaFiltrare.HasDelegate)
+        {
+            testoDaFiltrare.InvokeAsync(testoFiltrato);
+        }
+    }
+}

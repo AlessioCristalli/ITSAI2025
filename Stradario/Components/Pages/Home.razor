@@ -1,0 +1,74 @@
+﻿@page "/"
+@using Stradario.Strutture;
+@using Stradario;
+@inject BancaDati db
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<p>@db.Nodi.Count()</p>
+<p>@db.Archi.Count()</p>
+
+@if(stato == null)
+{
+    <button class="btn btn-success" @onclick="Importazione">Importa</button>
+}
+else if (stato == true)
+{
+    <p class="alert alert-success">Importazione ultimata</p>
+}
+else
+{
+    <p class="alert alert-danger"> Errori con il file...</p>
+}
+<button class="btn btn-success" @onclick="Trova">Trova percorso</button>
+
+@code {
+    private bool? stato = null;
+    // Se è null, vuol dire che l'operazione è in corso o non lanciata
+    // Se è true, vuol dire che l'operazione è andata a buon fine
+    // Se è false, ci sono stati errori con il file
+    protected override void OnInitialized()
+    {
+        Strada nuova = new Strada()
+            {
+                A = db.Nodi.OrderBy(x => x.IDnodo).First(),
+                B = db.Nodi.OrderBy(x => x.IDnodo).Last()
+            };
+        db.Strade.Add(nuova);
+        db.SaveChanges();
+        Strada salvata = db.Strade.OrderBy(x => x.IDstrada).Last();
+        base.OnInitialized();
+    }
+
+    private void Importazione()
+    {
+        stato = db.Importa("strade.csv");
+    }
+    private void Trova()
+    {
+        db.Nodi.First(x => x.Nome.ToLower() == "ancona"); // like 'a%'
+        db.Nodi.First(x => x.Nome.ToLower().StartsWith("A")); // like 'A%'
+        db.Nodi.First(x => x.Nome.ToLower().EndsWith("a")); // like 'a%'
+        db.Nodi.First(x => x.Nome.ToLower().Contains("nco")); // like '%nco%'
+
+        List<Nodo> soluzione = new List<Nodo>();
+        db.TrovaPercorso(
+            db.Nodi.First(x => x.Nome == "firenze"),
+            db.Nodi.First(x => x.Nome.ToLower().Trim() == "roma".ToLower().Trim()),
+            soluzione,
+            new Nodo[0]
+            );
+        if (soluzione.Count > 0)
+        {
+            Console.WriteLine("Percorso trovato");
+        }
+        else
+        {
+            Console.WriteLine("Nessun percorso trovato");
+        }
+    }
+}

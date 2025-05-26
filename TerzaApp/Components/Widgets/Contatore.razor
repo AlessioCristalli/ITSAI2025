@@ -1,0 +1,17 @@
+﻿<button class="btn btn-warning" @onclick="aumenta">@testo</button>
+<p>@testo: @voltePremuto</p>
+
+@code {
+    [Parameter] public string testo { get; set; } = String.Empty;
+    [Parameter] public EventCallback<int> OnClick { get; set; }
+    public int voltePremuto { get; set; } = 0;
+
+    public void aumenta()
+    {
+        voltePremuto++;
+        if (OnClick.HasDelegate)
+        {
+            OnClick.InvokeAsync(voltePremuto);
+        }
+    }
+}

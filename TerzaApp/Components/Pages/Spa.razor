@@ -3,7 +3,7 @@
 @using TerzaApp.Dati.Strutture
 @inject TerzaApp.Dati.Archivio db
 
-<Titolo titolo="Prodotti" ricerca="true" OnRicerca="testo => ricerca = testo">
+<Titolo titolo="Prodotti" OnRicerca="testo => ricerca = testo">
     <u>usa questa pagina per gestire i tuoi prodotti!</u>
 </Titolo>
 
@@ -11,11 +11,17 @@
 {
     <div class ="row">
         <div class="col-md-3"><b>Nome</b></div>
-        <div class="col-md-3"><input @bind="bozza.Nome" class="form-control mb-2" /></div>
+        <div class="col-md-3">
+            <NoScurrilita testo="@bozza.Nome" testoDaFiltrare="x => bozza.Nome = x"></NoScurrilita>
+        </div> <!-- qui utilizzo una funzione -->
         <div class="col-md-3"><b>Prezzo</b></div>
-        <div class="col-md-3"><input type="number" @bind="bozza.Prezzo" min="0" class="form-control mb-2" /></div>
+        <div class="col-md-3">
+            <input type="number" @bind="bozza.Prezzo" min="0" class="form-control mb-2" />
+        </div>
         <div class="col-md-3"><b>Descrizione</b></div>
-        <div class="col-md-3"><textarea @bind="bozza.Descrizione" class="form-control mb-2"></textarea></div>
+        <div class="col-md-3">
+            <NoScurrilita testo="@bozza.Descrizione" testoDaFiltrare="x => bozza.Descrizione = x"></NoScurrilita>
+        </div> 
         <div class="col-md-3"><b>Categoria</b></div>
         <div class="col-md-3">
             <ListaLut elementi="db.categorie" etichetta="categoria..." PK="x => x.IDcategoria" OnSelect="x => bozza.IDcategoria = x" ID="bozza.IDcategoria"/>
@@ -41,7 +47,7 @@
                     }
                 }
             </select>
-            <!-- <div class="col-md-3"><input type="text" @bind="bozza.href" min="0" placeholder="Inserisci il nome dell'immagine" class="form-control mb-2" /></div> -->
+            <!--<div class="col-md-3"><input type="text" @bind="bozza.href" min="0" placeholder="Inserisci il nome dell'immagine" class="form-control mb-2" /></div> -->
         </div>    
         <div class="col-md-3"><b>Disponibilità</b></div>
         <div class="col-md-3"><input type="text" @bind="bozza.Disponibilità" min="0" placeholder="Inserisci la disponibilità" class="form-control mb-2" /></div>

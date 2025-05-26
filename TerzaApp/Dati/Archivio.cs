@@ -76,7 +76,6 @@ namespace TerzaApp.Dati
             singolo.IDordine++;
             ordini.Add(singolo);
         }
-
         public void Recupera()
         {
             if (File.Exists("archivio.json"))
@@ -94,7 +93,6 @@ namespace TerzaApp.Dati
                 }
             }
         }
-
         public void Salva()
         {
             JsonSerializerOptions opzioni = new JsonSerializerOptions

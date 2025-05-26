@@ -1,0 +1,52 @@
+﻿@implements IDisposable
+@page "/CicloVita"
+@page "/CicloVita/{sku}"
+<h3>Ciclo di vita della pagina</h3>
+<button class="btn btn-primary" @onclick="e => stato = !stato">@stato</button>
+<ol>
+    @foreach (String messaggio in messaggi)
+    {
+        <li>@messaggio</li>
+    }
+</ol>
+
+<br />
+<br />
+<Contatore testo="Ciao" OnClick="x => conteggio = x"></Contatore>
+<p>Conteggio: @conteggio</p>
+@code {
+    public int conteggio { get; set; } = 0;
+    [Parameter] public string sku { get; set; } = string.Empty;
+
+    private List<string> messaggi = new List<string>();
+    private bool stato = false;
+
+    protected override void OnInitialized()
+    {
+        messaggi.Add("OnInitialized");
+    }
+
+    protected override void OnParametersSet()
+    {
+        messaggi.Add("OnParametersSet");
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+            messaggi.Add("OnAfterRender (Prima volta)");
+        else
+            messaggi.Add("OnAfterRender");
+    }
+
+    protected override bool ShouldRender()
+    {
+        messaggi.Add("ShouldRender");
+        return base.ShouldRender();
+    }
+
+    public void Dispose()
+    {
+        messaggi.Add("Dispose");
+    }
+}

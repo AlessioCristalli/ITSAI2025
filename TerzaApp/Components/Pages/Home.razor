@@ -3,7 +3,7 @@
 @using TerzaApp.Dati.Strutture
 @inject TerzaApp.Dati.Archivio db
 
-<Titolo titolo="Home" ricerca="true" OnRicerca="testo => ricerca = testo">
+<Titolo @ref="titolo" titolo="Home" OnRicerca="t => testo = t">
     <i>Qui verranno esposti tutti i prodotti in vendita!</i>
 </Titolo>
 <br />
@@ -21,29 +21,33 @@
         </button>
     }
 </div>
-<div class="container mt-3">
-    <div class="row">
-        @foreach (Prodotto singolo in db.prodotti)
-        {
-            if (singolo.Nome.Contains(ricerca) || singolo.Descrizione.Contains(ricerca))
+@if (titolo != null)
+{
+    <div class="container mt-3">
+        <div class="row">
+            @foreach (Prodotto singolo in db.prodotti.Where(p => (p.Nome.Contains(testo) || p.Descrizione.Contains(testo)) && (titolo.IdCollezione != 0 || titolo.IdCollezione == p.IDcollezione) && (titolo.IdCategoria != 0 || titolo.IdCategoria == p.IDcategoria)))
             {
-                var nomeCategoria = db.categorie.FirstOrDefault(c => c.IDcategoria == singolo.IDcategoria)?.Nome;
-                var nomeCollezione = db.collezioni.FirstOrDefault(c => c.IDcollezione == singolo.IDcollezione)?.NomeCollezione;
-                <Product prodotto="singolo" inFila="@disposizione" categoria="@nomeCategoria" collezione="@nomeCollezione" source="@($"/Immagini/{singolo.href}")"/>
+                if (singolo.Nome.Contains(testo) || singolo.Descrizione.Contains(testo))
+                {
+                    var nomeCategoria = db.categorie.FirstOrDefault(c => c.IDcategoria == singolo.IDcategoria)?.Nome;
+                    var nomeCollezione = db.collezioni.FirstOrDefault(c => c.IDcollezione == singolo.IDcollezione)?.NomeCollezione;
+                    <Product prodotto="singolo" inFila="@disposizione" categoria="@nomeCategoria" collezione="@nomeCollezione" source="@($"/Immagini/{singolo.href}")" />
+                }
             }
-        }
+        </div>
     </div>
-</div>
+}
+
+
 
 @code {
-    string ricerca = "";
+    Titolo titolo = new Titolo();
+    string testo = "";
     bool disposizione = true;
 
-    protected override void OnInitialized()
+    void ricerca(string testoCercato)
     {
-        // controllo se esiste un archivio dei prodotti
-
-        base.OnInitialized();
+        testo = testoCercato;
     }
 }
 

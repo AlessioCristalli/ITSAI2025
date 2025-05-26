@@ -1,0 +1,114 @@
+﻿@page "/Spa"
+@using Stradario.Strutture
+@inject BancaDati db
+@implements IDisposable
+<h3>Nodi</h3>
+
+@if(draft == null)
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th class="text-end">Longitudine "X"</th>
+                <th class="text-end">Latitudine "Y"</th>
+                <th class="text-end">Creazione</th>
+                <th class="w-25 text-end"><div class="btn btn-success" @onclick="Nuovo">nuovo</div></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Nodo singolo in db.Nodi.OrderBy(x => x.Nome))
+            {
+                <tr @onclick="e => draft = singolo">
+                    <td class="w-25">@singolo.IDnodo</td>
+                    <td>@singolo.Nome</td>
+                    <td class="text-end">@singolo.X</td>
+                    <td class="text-end">@singolo.Y</td>
+                    <td class="w-25 text-end">@singolo.Creazione.ToShortDateString()</td>
+                    <td class="w-25 text-end"><div class="btn btn-danger" @onclick:stopPropagation="true" @onclick="e => Cancella(singolo)">cancella</div></td>
+                </tr>
+            }
+        </tbody>
+        
+    </table>
+} else
+{
+    <p>Modifica il nome del nodo e premi Salva!</p>
+    <p>
+        <label for="nome">Nome del nodo</label>
+        <input class="form-control" id="nome" @bind="draft.Nome" />
+    </p>
+    <p>
+        <div class="btn btn-success me-2" @onclick="Salva">Chiudi</div>
+    </p>
+}
+
+
+@code {
+    private Nodo? draft;
+
+    private void Nuovo()
+    {
+        draft = new Nodo();
+    }
+
+    private void Salva()
+    {
+        if (!db.Nodi.Contains(draft))
+        {
+            db.Nodi.Add(draft);
+        }
+        Nominatim.RecuperaHTTP(draft);
+        draft = null;
+        db.SaveChanges();
+    }
+
+    public void Dispose()
+    {
+        //db.SaveChanges();
+    }
+
+    private void Cancella(Nodo selezionato)
+    {
+        db.Nodi.Remove(selezionato);
+        db.SaveChanges();
+    }
+
+    //PARTE VECCHIA//
+
+    /*
+  * private async Task RecuperaTuttiNodiHTTP()
+    {
+        foreach (var nodo in db.Nodi.Where(n => n.X == 0 && n.Y == 0))
+        {
+            Nominatim.RecuperaHTTP(nodo); // await RecuperaHTTP(nodo)
+            }
+        //db.SalvaInArchivio();
+        StateHasChanged();
+        }
+
+    private static async Task RecuperaNodoHTTP(Nodo nodo)
+    {
+        string url = $"https://nominatim.openstreetmap.org/search?q={nodo.Nome}&format=jsonv2&limit=1";
+        HttpClient client = new HttpClient();
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Add("User-Agent", "Other");
+        HttpResponseMessage response = client.Send(request);
+        if (response.IsSuccessStatusCode)
+        {
+            // Decodifico il json
+            string json = response.Content.ReadAsStringAsync().Result;
+            List Luogo risultati = JsonSerializer.Deserialize List Luogo (json);
+            if (risultati != null && risultati.Count > 0)
+            {
+                nodo.X = double.Parse(risultati[0].lon, System.Globalization.CultureInfo.InvariantCulture);
+                nodo.Y = double.Parse(risultati[0].lat, System.Globalization.CultureInfo.InvariantCulture);
+                }
+            }
+        }
+    }
+*/
+}
+
+    

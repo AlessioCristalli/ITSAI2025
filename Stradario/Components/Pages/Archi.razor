@@ -1,0 +1,125 @@
+﻿@page "/Archi"
+@using Stradario.Strutture
+@using Stradario.Components.Widgets
+@inject BancaDati db
+
+<PageTitle>Archi</PageTitle>
+<h1>Archi</h1>
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link active">Gestione archi</a>
+    </li>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">@(db.Nodi.FirstOrDefault(n => n.IDnodo == punto1ID)?.Nome ?? "Punto 1")</a>
+        <ul class="dropdown-menu">
+            <li><button class="dropdown-item" @onclick="l => punto1ID = 0">Annulla</button></li>
+            @foreach (Nodo singolo in db.Nodi)
+            {
+                <li><button class="dropdown-item" @onclick="l => punto1ID = singolo.IDnodo">@singolo.Nome</button></li>
+            }
+        </ul>
+    </li>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">@(db.Nodi.FirstOrDefault(n => n.IDnodo == punto2ID)?.Nome ?? "Punto 2")</a>
+        <ul class="dropdown-menu">
+            <li><button class="dropdown-item" @onclick="l => punto2ID = 0">Annulla</button></li> 
+            @foreach (Nodo singolo in db.Nodi)
+            {
+                <li><button class="dropdown-item" @onclick="l => punto2ID = singolo.IDnodo">@singolo.Nome</button></li>
+            }
+        </ul>
+    </li>
+</ul>
+<br />
+@if(draft == null)
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>ID arco</th>
+                <th class="text-end">Punto A</th>
+                <th class="text-end">Punto B</th>
+                <th class="text-end">Distanza</th>
+                <th class="text-end">Creazione</th>
+                <th class="w-25 text-end"><div class="btn btn-success" @onclick="Nuovo">nuovo</div></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Arco singolo in db.Archi.Where(a => (punto1ID == 0 && punto2ID == 0) || (a.A == punto1ID && a.B == punto2ID) || (a.A == punto2ID && a.B == punto1ID)))
+            {
+                <tr @onclick="e => draft = singolo">
+                    <td>@singolo.IDarco</td>
+                    <td class="w-25 text-end">@db.Nodi.FirstOrDefault(n => n.IDnodo == singolo.A)</td>
+                    <td class="w-25 text-end">@db.Nodi.FirstOrDefault(n => n.IDnodo == singolo.B)</td>
+                    <td class="w-25 text-end">@($"{singolo.Distanza:F2}") km</td>
+                    <td class="w-25 text-end">@singolo.Creazione.ToShortDateString()</td>
+                    <td class="w-25 text-end"><div class="btn btn-danger" @onclick:stopPropagation="true" @onclick="e => Cancella(singolo)">cancella</div></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+} else
+{
+    <p>Modifica i punti dell'arco stradale</p>
+    <h5>Partenza</h5>
+    <p>
+        <ListaLut elementi="db.Nodi" etichetta="..." PK="x => x.IDnodo" OnSelect="x => draft.A = x" ID="draft.A" />
+    </p>
+    <h5>Arrivo</h5>
+    <p>
+        <ListaLut elementi="db.Nodi" etichetta="..." PK="x => x.IDnodo" OnSelect="x =>  draft.B = x" ID="draft.B" />
+    </p>
+    <label for="nome">Distanza</label>
+    <p>
+        <input class="form-control" type="text" value="@($"{distanzaCorrente:F2} km")" disabled />
+    </p>
+    <p>
+        <div class="btn btn-success me-2" @onclick="Salva">Chiudi</div>
+    </p>
+}
+
+
+@code {
+    private uint punto1ID;
+    private uint punto2ID;
+    private float distanzaCorrente => CalcolaDistanzaInKm();
+    private Arco? draft;
+
+    private void Nuovo()
+    {
+        draft = new Arco();
+    }
+
+    private void Salva()
+    {
+       // draft.Distanza = CalcolaDistanzaInKm();
+        if (!db.Archi.Contains(draft))
+        {
+            db.Archi.Add(draft);
+        }
+
+        draft = null;
+        db.SaveChanges();
+    }
+
+    public void Dispose()
+    {
+        db.SaveChanges();
+    }
+
+    private void Cancella(Arco selezionato)
+    {
+        db.Archi.Remove(selezionato);
+        db.SaveChanges();
+    }
+
+   private float CalcolaDistanzaInKm()
+    {
+        var lat1 = db.Nodi.FirstOrDefault(n => n.IDnodo == draft.A)?.Y ?? 0;
+        var lon1 = db.Nodi.FirstOrDefault(n => n.IDnodo == draft.A)?.X ?? 0;
+        var lat2 = db.Nodi.FirstOrDefault(n => n.IDnodo == draft.B)?.Y ?? 0;
+        var lon2 = db.Nodi.FirstOrDefault(n => n.IDnodo == draft.B)?.X ?? 0;
+        var distanza = HaversineCalculator.Haversine.CalcolaDistanza(lat1, lon1, lat2, lon2);
+        return (float)distanza;
+    }
+}

@@ -1,4 +1,6 @@
-﻿<h1>
+﻿@using TerzaApp.Dati
+@inject Archivio db
+<h1>
     <i class="bi bi-pencil me-2" />
     @titolo
 </h1>
@@ -6,21 +8,25 @@
 {
     <p>@ChildContent</p>
 }
-@if (ricerca)
+@if (OnRicerca.HasDelegate)
 {
-    <div>
-        <input class="form-control" placeholder="Cerca..." @onchange="TestoCambiato"/>
+    <div class="input-group">
+        <ListaLut elementi="db.categorie" PK="x => x.IDcategoria" OnSelect="s => IdCategoria = s" etichetta="Categoria..." />
+        <ListaLut elementi="db.collezioni" PK="x => x.IDcollezione" OnSelect="s => IdCollezione = s" etichetta="Collezione..." />
+        <input class="form-control" placeholder="Cerca..." @oninput="TestoCambiato"/>
     </div>
 }
 
 @code {
     [Parameter] public string titolo { get; set; } = string.Empty;
 
-    [Parameter] public bool ricerca { get; set; } = false;
-
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     [Parameter] public EventCallback<string> OnRicerca { get; set; }
+
+    public int IdCollezione { get; set; } = 0;
+    public int IdCategoria { get; set; } = 0;
+
 
     private void TestoCambiato(ChangeEventArgs eventArgs)
     {

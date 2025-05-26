@@ -1,0 +1,197 @@
+﻿@page "/Labirinto/{CelleX:int}/{CelleY:int}"
+<h3>Labirinto</h3>
+
+<div class="row g-2">
+    <div class="col-md-6">
+        @if (labirinto != null)
+        {
+            <table>
+                @for (int y = 0; y < CelleY; y++)
+                {
+                    <tr>
+                        @for (int x = 0; x < CelleX; x++)
+                        {
+                            int xa = x;
+                            int ya = y;
+                            string colore = "";
+                            if (illuminata != null && illuminata.x == xa && illuminata.y == ya)
+                            {
+                                colore = "primary";
+                            } else if (inizio != null && inizio.x == xa && inizio.y == ya)
+                            {
+                                colore = "success";
+                            }
+                            else if (fine != null && fine.x == xa && fine.y == ya)
+                            {
+                                colore = "danger";
+                            } 
+                            else if (soluzione.Any(x => x.Equals(new Coord(xa, ya))))
+                            {
+                                colore = "warning";
+                            }                            
+                            else
+                            {
+                                colore = "secondary";
+                            }
+                            <td @onclick="e => Imposta(xa, ya)" @ondblclick="e => InizioFine(xa, ya)">
+                                @if (labirinto[xa, ya] && colore != "success" && colore != "danger" && colore != "warning")
+                                {
+                                    <div class="btn btn-outline-@colore" style="width: 2em; height: 2em;"></div>
+                                }
+                                else
+                                {
+                                    <div class="btn btn-@colore" style="width: 2em; height: 2em;"></div>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </table>
+        }
+    </div>
+    <div class="col-md-6">
+        @foreach (Coord singola in soluzione)
+        {
+            <span class="badge bg-primary p-2 m-1" @onmouseover="e => illuminata = singola">@singola</span>
+        }
+    </div>
+    <div class="col-md-12">
+        @if (inizio != null && fine != null)
+        {
+            <button class="btn btn-primary w-100" @onclick="Risolvi">risolvi</button>
+
+        }
+    </div>
+</div>
+
+@code {
+
+    [Parameter] public int CelleX { get; set; } = 10;
+    [Parameter] public int CelleY { get; set; } = 10;
+
+    private bool[,]? labirinto;
+    private List<Coord> soluzione = new List<Coord>();
+
+    private Coord? inizio;
+    private Coord? fine;
+
+    private Coord? illuminata; 
+
+    protected override void OnParametersSet()
+    {
+        labirinto = new bool[CelleX, CelleY];
+        for (int x = 0; x < CelleX; x++)
+            for (int y = 0; y < CelleY; y++)
+                labirinto[x, y] = true;
+
+        base.OnParametersSet();
+    }
+
+    void Imposta(int x, int y)
+    {
+        labirinto[x, y] = !labirinto[x, y];
+    }
+
+    void InizioFine(int x, int y)
+    {
+        if(inizio == null)
+        {
+            inizio = new Coord(x, y);
+        }
+        else if (fine == null)
+        {
+            fine = new Coord(x, y);
+        }
+        else
+        {
+            inizio = null;
+            fine = null;
+        }
+    }
+
+    void Risolvi()
+    {
+        soluzione.Clear();
+        new Viaggiatore(soluzione, labirinto, new Coord[0], inizio, fine);
+    }
+
+    class Coord
+    {
+        public int x { get; set; } = 0;
+        public int y { get; set; } = 0;
+
+        public Coord(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+
+        public override string ToString()
+        {
+            return $"{x} {y}";
+        }
+
+        public bool Equals(Coord p2)
+        {
+            return this.x == p2.x && this.y == p2.y;
+        }
+    }
+
+    class Viaggiatore
+    {
+        public Coord[]? passi { get; set; }
+        public Viaggiatore(List<Coord> soluzione, bool[,] labirinto, Coord[] attualePercorso, Coord attuale, Coord fine)
+        {
+            passi = attualePercorso;
+            if(attuale.x < 0 || 
+                attuale.x >= labirinto.GetLength(0) || 
+                attuale.y < 0 || 
+                attuale.y >= labirinto.GetLength(1) ||
+                !labirinto[attuale.x, attuale.y] ||
+                passi.Any(p => p.Equals(attuale))
+            )
+            {
+                // sono morto
+                return;
+            }
+
+            // sono vivo
+            Coord? precedente = attualePercorso.LastOrDefault();
+            Coord? delta = null;
+            if (precedente != null)
+            {
+                delta = new Coord(attuale.x - precedente.x, attuale.y - precedente.y);
+            }
+
+
+            Coord[] direzioni = new Coord[]
+            {
+                new Coord(1, 0),   // Est
+                new Coord(-1, 0),  // Ovest
+                new Coord(0, 1),   // Nord
+                new Coord(0, -1)   // Sud
+            };
+
+            if(attuale.Equals(fine))
+            {
+                passi = passi.Append(attuale).ToArray();
+                // mi posso iscrivere tra i vincitori
+
+                if (soluzione.Count == 0 || passi.Length < soluzione.Count)
+                {
+                    soluzione.Clear();
+                    soluzione.AddRange(passi);
+                }
+            } else
+            {
+                foreach (var direzione in direzioni)
+                {
+                    if (delta == null || !(direzione.x == -delta.x && direzione.y == -delta.y)){ // si vuole escludere solo la direzione esattamente opposta.
+                        var prossimo = new Coord(attuale.x + direzione.x, attuale.y + direzione.y);
+                        new Viaggiatore(soluzione, labirinto, passi.Append(attuale).ToArray(), prossimo, fine);
+                    }
+                }
+            }
+        }
+    }
+}

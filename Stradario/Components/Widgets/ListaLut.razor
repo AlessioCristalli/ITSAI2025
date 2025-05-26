@@ -21,18 +21,18 @@
     /// <summary>
     /// Il valore dell'id selezionato all'apertura del componente
     /// </summary>
-    [Parameter] public int ID { get; set; } = 0;
+    [Parameter] public uint ID { get; set; } = 0;
     /// <summary>
     /// carica la collezione degli elementi 
     /// </summary>
     [Parameter] public IEnumerable<TItem> elementi { get; set; }
     //EvenetCallback ci permette di avvertire l'utente
-    [Parameter] public EventCallback<int> OnSelect { get; set; }
+    [Parameter] public EventCallback<uint> OnSelect { get; set; }
     //Func essere avverititi dallutente
     /// <summary>
     /// indica la chiave primaria della Lut
     /// </summary>
-    [Parameter] public Func<TItem, int> PK { get; set; }
+    [Parameter] public Func<TItem, uint> PK { get; set; }
     /// <summary>
     /// indica la descrizione che l'utente troverà quando non è selezionato alcun valore
     /// </summary>
@@ -40,7 +40,7 @@
 
     private void Change(ChangeEventArgs evento)
     {
-        int idSelezionato = int.Parse(evento.Value.ToString());
+        uint idSelezionato = uint.Parse(evento.Value.ToString());
         if (OnSelect.HasDelegate)
         {
             OnSelect.InvokeAsync(idSelezionato);
