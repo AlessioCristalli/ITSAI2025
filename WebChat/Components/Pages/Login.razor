@@ -1,0 +1,58 @@
+﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using WebChat.Dati.Strutture
+@using WebChat.Dati
+@inject NavigationManager Navigation
+@inject BancaDati db
+
+
+<div class="card-header bg-primary text-center">
+    <h4>Accedi al tuo account</h4>
+</div>
+@if(loginUtente.IDutente == 0)
+{
+    <div class="card-body">
+        <EditForm Model="@loginUtente" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <InputText @bind-Value="loginUtente.Email" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <InputText @bind-value="loginUtente.Password" type="password" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-primary me-2">Login</button>
+        </EditForm>
+    </div>
+}
+@if (!string.IsNullOrEmpty(avviso))
+{
+    <div class="alert @alertClass mt-3">@avviso</div>
+}
+
+
+@code {
+    private Utente loginUtente = new Utente();
+    private string avviso;
+    private string alertClass;
+
+    private void HandleLogin()
+    {
+        var utenteTrovato = db.Utenti.FirstOrDefault(u => u.Email == loginUtente.Email && u.Password == loginUtente.Password);
+        if (utenteTrovato != null)
+        {
+            //Navigation.NavigateTo("/registrazione");
+            avviso = "Credenziali valide. Bentornato.";
+            alertClass = "alert-success";
+            loginUtente = utenteTrovato;
+        }
+        else
+        {
+            avviso = "Credenziali non valide. Riprova.";
+            alertClass = "alert-danger";
+        }
+    }
+}

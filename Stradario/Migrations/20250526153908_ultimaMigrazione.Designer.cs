@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Stradario;
 
@@ -10,9 +11,11 @@ using Stradario;
 namespace Stradario.Migrations
 {
     [DbContext(typeof(BancaDati))]
-    partial class BancaDatiModelSnapshot : ModelSnapshot
+    [Migration("20250526153908_ultimaMigrazione")]
+    partial class ultimaMigrazione
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.5");

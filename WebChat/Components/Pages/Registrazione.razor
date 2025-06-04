@@ -1,0 +1,117 @@
+﻿@page "/registrazione"
+@using WebChat.Dati.Strutture;
+@using WebChat.Dati;
+@inject BancaDati db
+
+<h3>Registrazione Utenti</h3>
+@if (draft == null)
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>IDutente</th>
+                <th>Nome</th>
+                <th class="text-end">Email</th>
+                <th class="text-end"><button class="btn" @onclick="n => inVista = !inVista"><b>Password</b> @(inVista ? "👁️" : "🙈")</button></th>
+                <th class="w-25 text-end"><div class="btn btn-success" @onclick="Nuovo">Nuovo</div></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Utente singolo in db.Utenti.OrderBy(x => x.IDutente))
+            {
+                <tr @ondblclick="e => draft = singolo">
+                    <td class="w-25">@singolo.IDutente</td>
+                    <td>@singolo.Nome</td>
+                    <td class="text-end">@singolo.Email</td>
+                    <td class="text-end">@((inVista ? singolo.Password : nascondiPassword(singolo.Password)))</td>
+                    <td class="w-25 text-end"><div class="btn btn-danger" @onclick:stopPropagation="true" @onclick="e => Cancella(singolo)">Cancella</div></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td class="text-end"></td>
+            </tr>
+        </tfoot>
+    </table>
+}
+else{
+    <div class="mb-3">
+        <label for="username" class="form-label">Nome utente</label>
+        <input id="username" @bind="draft.Nome" type="text" class="form-control"/>
+    </div>
+
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input id="email" @bind="draft.Email" type="email" class="form-control"/>
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input id="password" @bind="draft.Password" type="password" class="form-control"/>
+    </div>
+
+    <div class="mb-3">
+        <button class="btn btn-success me-2" @onclick="Salva">Salva</button>
+    </div>
+}
+@if(!String.IsNullOrEmpty(avviso))
+{
+    <div class="alert @alertClass">@avviso</div>
+}
+
+@code {
+    private Utente? draft;
+    string avviso;
+    string alertClass;
+    bool inVista = true;
+
+    public void Salva()
+    {
+        if (string.IsNullOrWhiteSpace(draft.Nome) || string.IsNullOrWhiteSpace(draft.Email) || string.IsNullOrWhiteSpace(draft.Password)) // Evita che crashi quando si clicka su salva senza aver compilato i campi
+        {     
+            avviso = "⚠️ Tutti i campi sono obbligatori.";
+            alertClass = "alert-warning";
+            return;
+        }   // nessun utente (diverso da quello corrente) deve avere la stessa email
+        if (!db.Utenti.Any(u => u.Email == draft.Email && u.IDutente != draft.IDutente)) // La condizione dell'ID permette di modificare un utente, dato che l'email è già presente nel database
+        { 
+            if (draft.IDutente == 0) // Utente non è stato ancora registrato, quindi l'id di draft è ancora 0.
+            {
+                db.Utenti.Add(draft);
+                avviso = $"✅ L'utente {draft.Nome} è stato registrato con successo!";
+                alertClass = "alert-success";
+            }
+            else
+            {
+                db.Utenti.Update(draft);
+                avviso = $"✅ L'utente {draft.Nome} è stato modificato con successo!";
+                alertClass = "alert-info";
+            }
+            db.SaveChanges();
+            draft = null;
+        }
+        else
+        {
+            avviso = "⚠️ Esiste già un utente registrato con questa email.";
+            alertClass = "alert-warning";
+        }
+    }
+    private void Nuovo()
+    {
+        draft = new Utente();
+    }
+
+    private void Cancella(Utente selezionato)
+    {
+        db.Utenti.Remove(selezionato);
+        db.SaveChanges();
+        avviso = "L'Utente è stato eliminato";
+        alertClass = "alert-danger";
+    }
+
+    private string nascondiPassword(String password)
+    {
+        return new string('•', password.Length);
+    }
+}

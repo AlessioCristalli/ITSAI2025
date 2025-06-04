@@ -48,6 +48,7 @@ else
     {
         stato = db.Importa("strade.csv");
     }
+
     private void Trova()
     {
         db.Nodi.First(x => x.Nome.ToLower() == "ancona"); // like 'a%'
@@ -57,8 +58,8 @@ else
 
         List<Nodo> soluzione = new List<Nodo>();
         db.TrovaPercorso(
-            db.Nodi.First(x => x.Nome == "firenze"),
-            db.Nodi.First(x => x.Nome.ToLower().Trim() == "roma".ToLower().Trim()),
+            db.Nodi.First(x => x.Nome == "Firenze"),
+            db.Nodi.First(x => x.Nome.ToLower().Trim() == "milano".ToLower().Trim()),
             soluzione,
             new Nodo[0]
             );

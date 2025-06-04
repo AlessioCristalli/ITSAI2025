@@ -1,0 +1,150 @@
+﻿@page "/gruppo"
+@using System.Text.Json;
+
+<h3>Gestione dei gruppi</h3>
+@if (draft == null)
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>IDgruppo</th>
+                <th>Nome</th>
+                <th class="text-end">Descrizione</th>
+                <th class="text-end">Data di creazione</th>
+                <th class="w-25 text-end"><div class="btn btn-success" @onclick="Nuovo">Nuovo</div></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Gruppo singolo in gruppi.OrderBy(x => x.IDgruppo))
+            {
+                <tr @ondblclick="e => draft = singolo">
+                    <td class="w-25">@singolo.IDgruppo</td>
+                    <td>@singolo.Nome</td>
+                    <td class="text-end">@singolo.Descrizione</td>
+                    <td class="text-end">@singolo.Creazione</td>
+                    <td class="w-25 text-end"><div class="btn btn-danger" @onclick:stopPropagation="true" @onclick="e => Cancella(singolo)">Cancella</div></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="mb-3">
+        <label for="Nome" class="form-label">Nome Gruppo</label>
+        <input id="Nome" @bind="draft.Nome" type="text" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label for="Descrizione" class="form-label">Descrizione</label>
+        <input id="Descrizione" @bind="draft.Descrizione" type="text" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <button class="btn btn-success me-2" @onclick="Salva">Salva</button>
+    </div>
+}
+@if (!String.IsNullOrEmpty(avviso))
+{
+    <div class="alert @alertClass">@avviso</div>
+}
+
+@code {
+    public class Gruppo
+    {
+        public int IDgruppo { get; set; }
+        public string Nome { get; set; }
+        public string Descrizione { get; set; }
+        public DateTime Creazione { get; set; } = DateTime.Now;
+    }
+    private List<Gruppo> gruppi = new();
+    private Gruppo? draft;
+    string avviso;
+    string alertClass;
+
+    protected override void OnInitialized()
+    {
+        Recupera();
+        base.OnInitialized();
+    }
+    public void Salva()
+    {
+        if (string.IsNullOrWhiteSpace(draft.Nome)) // Evita che crashi quando si clicka su salva senza aver compilato i campi
+        {
+            avviso = "⚠️ Il nome del gruppo è obbligatorio!";
+            alertClass = "alert-warning";
+            return;
+        }   // nessun gruppo (diverso da quello corrente) deve avere lo stesso nome.
+        if (!gruppi.Any(u => u.Nome == draft.Nome && u.IDgruppo != draft.IDgruppo))
+        {
+            if (draft.IDgruppo == 0) // Il gruppo non è stato ancora registrato, quindi il suo ID è ancora 0.
+            {
+                draft.Creazione = DateTime.Now;
+                addgruppo(draft);
+                avviso = $"✅ Il gruppo {draft.Nome} è stato creato con successo!";
+                alertClass = "alert-success";
+            }
+            else // il gruppo è presente dentro gruppi quindi lo modifico
+            {
+                var indice = gruppi.FindIndex(g => g.IDgruppo == draft.IDgruppo); // Quando non trova l'indice corrispondente restituisce -1.
+                if (indice != -1) // quindi se indice non è -1 vuol dire che ha trovato il gruppo preciso.
+                {
+                    gruppi[indice] = draft;
+                }
+                avviso = $"✅ Il gruppo {draft.Nome} è stato modificato con successo!";
+                alertClass = "alert-info";
+            }
+            draft = null;
+            SalvaInJson();
+        }
+        else
+        {
+            avviso = "⚠️ Esiste già un gruppo con questo nome.";
+            alertClass = "alert-warning";
+        }
+    }
+
+    private void Nuovo()
+    {
+        draft = new Gruppo();
+    }
+
+    private void Cancella(Gruppo selezionato)
+    {
+        gruppi.Remove(selezionato);
+        alertClass = "alert-danger";
+        avviso = $"Il gruppo {selezionato.Nome} è stato eliminato";
+        SalvaInJson();
+    }
+
+    public void addgruppo(Gruppo singolo)
+    {
+        foreach (Gruppo registrato in gruppi)
+        {
+            singolo.IDgruppo = Math.Max(singolo.IDgruppo, registrato.IDgruppo);
+        }
+        singolo.IDgruppo++;
+        gruppi.Add(singolo);
+    }
+
+    public void Recupera()
+    {
+        if (File.Exists("ArchivioGruppi.json"))
+        {
+            string json = File.ReadAllText("ArchivioGruppi.json");
+            List<Gruppo> vecchio = JsonSerializer.Deserialize<List<Gruppo>>(json);
+            if (vecchio != null)
+            {
+                this.gruppi = vecchio;
+            }
+        }
+    }
+
+    public void SalvaInJson()
+    {
+        JsonSerializerOptions opzioni = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+        string json = JsonSerializer.Serialize(gruppi, opzioni);
+        File.WriteAllText("ArchivioGruppi.json", json);
+    }
+}
